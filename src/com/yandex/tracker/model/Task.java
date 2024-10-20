@@ -1,16 +1,22 @@
+package com.yandex.tracker.model;
+
+import com.yandex.tracker.service.TaskStatus;
+
 import java.util.Objects;
 
 public class Task {
     protected String nameTask;
     protected String descriptionTask;
     protected int id;
-    protected String status = TaskStatus.NEW;
+    protected TaskStatus status = TaskStatus.NEW;
 
     public Task() {
     }
 
-    public Task(String nameTask) {
+    public Task(String nameTask, String descriptionTask, TaskStatus status) {
         this.nameTask = nameTask;
+        this.descriptionTask = descriptionTask;
+        this.status = status;
     }
 
     public String getNameTask() {
@@ -21,12 +27,12 @@ public class Task {
         this.nameTask = nameTask;
     }
 
-    public String getDiscriptionTask() {
+    public String getDescriptionTask() {
         return descriptionTask;
     }
 
-    public void setDiscriptionTask(String discriptionTask) {
-        this.descriptionTask = discriptionTask;
+    public void setDescriptionTask(String descriptionTask) {
+        this.descriptionTask = descriptionTask;
     }
 
     public int getId() {
@@ -37,11 +43,11 @@ public class Task {
         this.id = id;
     }
 
-    public String getStatus() {
+    public TaskStatus getStatus() {
         return status;
     }
 
-    public void setStatus(String status) {
+    public void setStatus(TaskStatus status) {
         this.status = status;
     }
 
