@@ -60,21 +60,21 @@ public class Main {
             task1.setNameTask("Обновленная Задача1");
             task1.setDescriptionTask("Обновленное описание задачи1");
             task1.setStatus(TaskStatus.IN_PROGRESS);
-            manager.updateTask(task1); // Обновляем существующую задачу
+            manager.updateTask(task1);
         }
 
         if (task2.getId() != 0) {
             task2.setNameTask("Обновленная Задача2");
             task2.setDescriptionTask("Обновленное описание задачи2");
             task2.setStatus(TaskStatus.IN_PROGRESS);
-            manager.updateTask(task2); // Обновляем существующую задачу
+            manager.updateTask(task2);
         }
 
         if (task3.getId() != 0) {
             task3.setNameTask("Обновленная Задача3");
             task3.setDescriptionTask("Обновленное описание задачи3");
             task3.setStatus(TaskStatus.DONE);
-            manager.updateTask(task3); // Обновляем существующую задачу
+            manager.updateTask(task3);
         }
 
         Epic epic3 = new Epic("Новый Эпик1", "Описание нового эпика1");

@@ -91,7 +91,7 @@ public class TaskManager {
     }
 
     public void removeTaskById(int id) {
-        Task task = getTaskById(id); // Предполагается, что у вас есть метод для получения задачи по ID
+        Task task = getTaskById(id);
         if (task != null) {
             taskList.remove(task);
         }
@@ -106,7 +106,7 @@ public class TaskManager {
                 epic.getSubtasks().remove(subtask);
                 updateEpicStatus(epic);
             }
-            Subtask remove = subtaskList.remove(subtask);
+            subtaskList.remove(subtask);
         }
     }
 
