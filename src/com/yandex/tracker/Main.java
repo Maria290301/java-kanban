@@ -6,153 +6,105 @@ import com.yandex.tracker.model.Task;
 import com.yandex.tracker.service.TaskManager;
 import com.yandex.tracker.service.TaskStatus;
 
-import java.util.List;
-
 public class Main {
     public static void main(String[] args) {
-        System.out.println("Запускаем тестирование:");
+
         TaskManager manager = new TaskManager();
 
-        Task task1 = new Task("Задача1", "Описание задачи1", TaskStatus.NEW);
-        Task task2 = new Task("Задача2", "Описание задачи2", TaskStatus.NEW);
-        Task task3 = new Task("Задача3", "Описание задачи3", TaskStatus.NEW);
-        manager.createTask(task1);
-        manager.createTask(task2);
-        manager.createTask(task3);
+        Task task1 = new Task("Task #1", "Task1 description", TaskStatus.NEW);
+        Task task2 = new Task("Task #2", "Task2 description", TaskStatus.IN_PROGRESS);
+        final int taskId1 = manager.createTask(task1);
+        final int taskId2 = manager.createTask(task2);
 
-        Epic epic1 = new Epic("Эпик1", "Описание эпика1");
-        Epic epic2 = new Epic("Эпик2", "Описание эпика2");
-        manager.createEpic(epic1);
-        manager.createEpic(epic2);
+        Epic epic1 = new Epic("Epic #1", "Epic1 description");
+        Epic epic2 = new Epic("Epic #2", "Epic2 description");
+        final int epicId1 = manager.createEpic(epic1);
+        final int epicId2 = manager.createEpic(epic2);
 
-        Subtask subtask1 = new Subtask("Подзадача1");
-        Subtask subtask2 = new Subtask("Подзадача2");
-        Subtask subtask3 = new Subtask("Подзадача3");
-        Subtask subtask4 = new Subtask("Подзадача4");
+        Subtask subtask1 = new Subtask("Subtask #1-1", "Subtask1 description", TaskStatus.NEW, epicId1);
+        Subtask subtask2 = new Subtask("Subtask #2-1", "Subtask1 description", TaskStatus.NEW, epicId1);
+        Subtask subtask3 = new Subtask("Subtask #3-2", "Subtask1 description", TaskStatus.DONE, epicId2);
+        final Integer subtaskId1 = manager.createSubtask(subtask1);
+        final Integer subtaskId2 = manager.createSubtask(subtask2);
+        final Integer subtaskId3 = manager.createSubtask(subtask3);
 
-        subtask1.setEpicId(epic1.getId());
-        subtask2.setEpicId(epic1.getId());
-        subtask3.setEpicId(epic2.getId());
-        subtask4.setEpicId(epic2.getId());
+        printAllTasks(manager);
 
-        manager.createSubtask(subtask1);
-        manager.createSubtask(subtask2);
-        manager.createSubtask(subtask3);
-        manager.createSubtask(subtask4);
-
-        Task task4 = new Task("Новая задача1", "Описание новой задачи1", TaskStatus.NEW);
-        manager.createTask(task4);
-
-        System.out.println("Получить список всех задач.");
-        printTasks(manager);
-        printEpic(manager);
-        printSubtasks(manager.getSubtasks());
-        System.out.println();
-
-        System.out.println("Получить по идентификатору.");
-        System.out.println(manager.getTaskById(task2.getId()));
-        System.out.println(manager.getEpicById(epic1.getId()));
-        System.out.println(manager.getSubtaskId(subtask2.getId()));
-        System.out.println();
-
-
-        if (task1.getId() != 0) {
-            task1.setNameTask("Обновленная Задача1");
-            task1.setDescriptionTask("Обновленное описание задачи1");
-            task1.setStatus(TaskStatus.IN_PROGRESS);
-            manager.updateTask(task1);
+        final Task task = manager.getTaskById(taskId2);
+        task.setStatus(TaskStatus.DONE);
+        manager.updateTask(task);
+        System.out.println("CHANGE STATUS: Task2 IN_PROGRESS->DONE");
+        System.out.println("Задачи:");
+        for (Task t : manager.getTasks()) {
+            System.out.println(t);
         }
 
-        if (task2.getId() != 0) {
-            task2.setNameTask("Обновленная Задача2");
-            task2.setDescriptionTask("Обновленное описание задачи2");
-            task2.setStatus(TaskStatus.IN_PROGRESS);
-            manager.updateTask(task2);
+        Subtask subtask = manager.getSubtaskById(subtaskId2);
+        subtask.setStatus(TaskStatus.DONE);
+        manager.updateSubtask(subtask);
+        System.out.println("CHANGE STATUS: Subtask2 NEW->DONE");
+        subtask = manager.getSubtaskById(subtaskId3);
+        subtask.setStatus(TaskStatus.NEW);
+        manager.updateSubtask(subtask);
+        System.out.println("CHANGE STATUS: Subtask3 DONE->NEW");
+        System.out.println("Подзадачи:");
+        for (Task t : manager.getSubtasks()) {
+            System.out.println(t);
         }
 
-        if (task3.getId() != 0) {
-            task3.setNameTask("Обновленная Задача3");
-            task3.setDescriptionTask("Обновленное описание задачи3");
-            task3.setStatus(TaskStatus.DONE);
-            manager.updateTask(task3);
+        System.out.println("Эпики:");
+        for (Task e : manager.getEpics()) {
+            System.out.println(e);
+            for (Task t : manager.getEpicSubtasks(e.getId())) {
+                System.out.println("--> " + t);
+            }
+        }
+        final Epic epic = manager.getEpicById(epicId1);
+        epic.setStatus(TaskStatus.NEW);
+        manager.updateEpic(epic);
+        System.out.println("CHANGE STATUS: Epic1 IN_PROGRESS->NEW");
+        printAllTasks(manager);
+
+        System.out.println("Эпики:");
+        for (Task e : manager.getEpics()) {
+            System.out.println(e);
+            for (Task t : manager.getEpicSubtasks(e.getId())) {
+                System.out.println("--> " + t);
+            }
         }
 
-        Epic epic3 = new Epic("Новый Эпик1", "Описание нового эпика1");
-        manager.updateEpic(epic1.getId(), epic3);
+        System.out.println("DELETE: Task1");
+        manager.removeTaskById(taskId1);
+        System.out.println("DELETE: Epic1");
+        manager.removeEpicById(epicId1);
+        printAllTasks(manager);
 
-        Subtask subtask5 = new Subtask("Подзадача новая2");
-        subtask5.setDescriptionTask("Описание новой подзадачи");
-        subtask5.setStatus(TaskStatus.IN_PROGRESS);
-        subtask5.setEpicId(epic1.getId());
-
-        int subtaskIdToUpdate = subtask2.getId();
-        manager.updateSubtask(subtaskIdToUpdate, subtask5);
-
-        manager.updateSubtask(subtask1.getId(), subtask1);
-        manager.updateSubtask(subtask2.getId(), subtask2);
-
-        System.out.println("Получить список всех задач после обновления.");
-        printTasks(manager);
-        printEpic(manager);
-        printSubtasks(manager.getEpicSubtasks(epic1.getId()));
-        System.out.println();
-
-        System.out.println("Обновить статус для задач");
-        manager.removeTaskById(task1.getId());
-        manager.removeSubtaskById(subtask3.getId());
-        manager.removeEpicById(epic1.getId());
-
-        System.out.println("Получен список всех задач после удаления по ID.");
-        printTasks(manager);
-        printEpic(manager);
-        printSubtasks(manager.getSubtasks());
-        System.out.println();
-
-        manager.removeAllTasks();
-        manager.removeAllEpics();
-        System.out.println("Список задач после удаления по ID");
-        printTasks(manager);
-        System.out.println();
-
-        System.out.println("Подзадачи для " + epic1.getNameTask() + ":");
-        List<Subtask> epic1Subtasks = manager.getEpicSubtasks(epic1.getId());
-        printSubtasks(epic1Subtasks);
-
-        System.out.println("Подзадачи для " + epic2.getNameTask() + ":");
-        List<Subtask> epic2Subtasks = manager.getEpicSubtasks(epic2.getId());
-        printSubtasks(epic2Subtasks);
+        System.out.println("Список задач после удаления:");
+        manager.removeTasks();
+        manager.removeEpics();
+        manager.removeSubtasks();
+        printAllTasks(manager);
     }
-
-    public static void printTasks(TaskManager manager) {
+    public static void printAllTasks(TaskManager manager) {
         if (manager.getTasks().isEmpty()) {
             System.out.println("Список задач пуст");
         } else {
-            for (int i = 0; i < manager.getTasks().size(); i++) {
-                Task task = manager.getTasks().get(i);
-                System.out.println((i + 1) + ". " + task.getNameTask() + " - Статус: " + task.getStatus().getDescription());
+            System.out.println("Задачи:");
+            for (Task task : manager.getTasks()) {
+                System.out.println(task);
             }
         }
-    }
-
-    public static void printEpic(TaskManager manager) {
-        if (manager.getEpics().isEmpty()) {
-            System.out.println("Список эпиков пуст");
-        } else {
-            for (int i = 0; i < manager.getEpics().size(); i++) {
-                Epic epic = manager.getEpics().get(i);
-                System.out.println((i + 1) + ". " + epic.getNameTask());
+        System.out.println("Эпики:");
+        for (Epic epic : manager.getEpics()) {
+            System.out.println(epic);
+            for (Subtask subtask : manager.getEpicSubtasks(epic.getId())) {
+                System.out.println("--> " + subtask);
             }
         }
-    }
 
-    public static void printSubtasks(List<Subtask> subtasks) {
-        if (subtasks.isEmpty()) {
-            System.out.println("Список подзадач пуст");
-        } else {
-            for (int i = 0; i < subtasks.size(); i++) {
-                Subtask subtask = subtasks.get(i);
-                System.out.println((i + 1) + ". " + subtask.getNameTask() + " - Статус: " + subtask.getStatus().getDescription());
-            }
+        System.out.println("Подзадачи:");
+        for (Subtask subtask : manager.getSubtasks()) {
+            System.out.println(subtask);
         }
     }
 }

@@ -1,12 +1,15 @@
 package com.yandex.tracker.model;
 
-import java.util.Objects;
+import com.yandex.tracker.service.TaskStatus;
 
 public class Subtask extends Task {
     private int epicId;
 
-    public Subtask(String nameTask) {
+    public Subtask(String nameTask, String descriptionTask, TaskStatus status, int epicId) {
         this.nameTask = nameTask;
+        this.descriptionTask = descriptionTask;
+        this.status = status;
+        this.epicId = epicId;
     }
 
     public int getEpicId() {
@@ -20,19 +23,5 @@ public class Subtask extends Task {
     @Override
     public String toString() {
         return super.toString();
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj) return true;
-        if (obj == null || getClass() != obj.getClass()) return false;
-        if (!super.equals(obj)) return false;
-        Subtask subtask = (Subtask) obj;
-        return epicId == subtask.epicId;
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(super.hashCode(), epicId);
     }
 }
