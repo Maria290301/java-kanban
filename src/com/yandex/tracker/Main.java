@@ -3,13 +3,14 @@ package com.yandex.tracker;
 import com.yandex.tracker.model.Epic;
 import com.yandex.tracker.model.Subtask;
 import com.yandex.tracker.model.Task;
+import com.yandex.tracker.service.Managers;
 import com.yandex.tracker.service.TaskManager;
 import com.yandex.tracker.service.TaskStatus;
 
 public class Main {
     public static void main(String[] args) {
 
-        TaskManager manager = new TaskManager();
+        TaskManager manager = Managers.getInMemoryTaskManager(Managers.getDefaultHistory());
 
         Task task1 = new Task("Task #1", "Task1 description", TaskStatus.NEW);
         Task task2 = new Task("Task #2", "Task2 description", TaskStatus.IN_PROGRESS);
@@ -85,6 +86,7 @@ public class Main {
         manager.removeSubtasks();
         printAllTasks(manager);
     }
+
     public static void printAllTasks(TaskManager manager) {
         if (manager.getTasks().isEmpty()) {
             System.out.println("Список задач пуст");
@@ -93,18 +95,24 @@ public class Main {
             for (Task task : manager.getTasks()) {
                 System.out.println(task);
             }
-        }
-        System.out.println("Эпики:");
-        for (Epic epic : manager.getEpics()) {
-            System.out.println(epic);
-            for (Subtask subtask : manager.getEpicSubtasks(epic.getId())) {
-                System.out.println("--> " + subtask);
-            }
-        }
 
-        System.out.println("Подзадачи:");
-        for (Subtask subtask : manager.getSubtasks()) {
-            System.out.println(subtask);
+            System.out.println("Эпики:");
+            for (Epic epic : manager.getEpics()) {
+                System.out.println(epic);
+                for (Task task : manager.getEpicSubtasks(epic.getId())) {
+                    System.out.println("--> " + task);
+                }
+            }
+
+            System.out.println("Подзадачи:");
+            for (Task subtask : manager.getSubtasks()) {
+                System.out.println(subtask);
+            }
+
+            System.out.println("История:");
+            for (Task task : manager.getHistory()) {
+                System.out.println(task);
+            }
         }
     }
 }
