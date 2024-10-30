@@ -18,7 +18,7 @@ public class InMemoryTaskManager implements TaskManager {
     private final HistoryManager historyManager;
 
     public InMemoryTaskManager(HistoryManager historyManager) {
-        this.historyManager = historyManager;
+        this.historyManager =  Managers.getDefaultHistory();
     }
 
     @Override
