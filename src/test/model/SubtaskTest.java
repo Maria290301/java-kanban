@@ -1,4 +1,4 @@
-package Test.model;
+package test.model;
 
 import com.yandex.tracker.model.Subtask;
 import com.yandex.tracker.service.TaskStatus;

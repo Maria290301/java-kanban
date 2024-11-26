@@ -15,16 +15,24 @@ public class InMemoryHistoryManager implements HistoryManager {
         if (task == null) {
             return;
         }
-        Node<Task> node = history.get(task.getId());
-        if (node != null) {
-            removeNode(node);
+        Integer taskId = task.getId();
+
+        if (history.containsKey(taskId)) {
+            removeNode(history.get(taskId));
         }
-        linkLast(task);
+
+        Node<Task> newNode = new Node<>(task);
+        history.put(taskId, newNode);
+        linkLast(newNode);
     }
 
     @Override
     public void remove(int id) {
-        removeNode(history.get(id));
+        Node<Task> nodeToRemove = history.get(id);
+        if (nodeToRemove != null) {
+            removeNode(nodeToRemove);
+            history.remove(id);
+        }
     }
 
     @Override
@@ -32,11 +40,11 @@ public class InMemoryHistoryManager implements HistoryManager {
         return getTasks();
     }
 
-    private void linkLast(Task element) {
+    private void linkLast(Node<Task> newNode) {
         final Node<Task> oldLast = last;
-        final Node<Task> newNode = new Node<>(oldLast, element, null);
+        newNode.prev = oldLast;
         last = newNode;
-        history.put(element.getId(), newNode);
+
         if (oldLast == null) {
             first = newNode;
         } else {
@@ -47,7 +55,7 @@ public class InMemoryHistoryManager implements HistoryManager {
     private List<Task> getTasks() {
         List<Task> tasks = new ArrayList<>();
         Node<Task> currentNode = first;
-        while (!(currentNode == null)) {
+        while (currentNode != null) {
             tasks.add(currentNode.task);
             currentNode = currentNode.next;
         }
@@ -55,35 +63,43 @@ public class InMemoryHistoryManager implements HistoryManager {
     }
 
     private void removeNode(Node<Task> node) {
-        if (!(node == null)) {
+        if (node != null) {
             final Node<Task> next = node.next;
             final Node<Task> prev = node.prev;
-            history.remove(node.task.getId());
+
             if (first == node && last == node) {
                 first = null;
                 last = null;
-            } else if (first == node && !(last == node)) {
+            } else if (first == node) {
                 first = next;
-                first.prev = null;
-            } else if (!(first == node) && last == node) {
+                if (first != null) {
+                    first.prev = null;
+                }
+            } else if (last == node) {
                 last = prev;
-                last.next = null;
+                if (last != null) {
+                    last.next = null;
+                }
             } else {
-                prev.next = next;
-                next.prev = prev;
+                if (prev != null) {
+                    prev.next = next;
+                }
+                if (next != null) {
+                    next.prev = prev;
+                }
             }
         }
     }
 
-    public static class Node<Task> {
-        public Task task;
-        public Node<Task> prev;
-        public Node<Task> next;
+    public static class Node<T> {
+        public T task;
+        public Node<T> prev;
+        public Node<T> next;
 
-        public Node(Node<Task> prev, Task task, Node<Task> next) {
+        public Node(T task) {
             this.task = task;
-            this.next = next;
-            this.prev = prev;
+            this.next = null;
+            this.prev = null;
         }
     }
 }
