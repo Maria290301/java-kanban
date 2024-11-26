@@ -1,4 +1,4 @@
-package com.yandex.tracker.test.model;
+package model;
 
 import com.yandex.tracker.model.Task;
 import com.yandex.tracker.service.InMemoryHistoryManager;
