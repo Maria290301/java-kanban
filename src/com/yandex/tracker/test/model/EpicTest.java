@@ -26,6 +26,7 @@ class EpicTest {
         assertTrue(subtasks.contains(subtask2), "Epic should contain subtask 2.");
     }
 
+    // Тестирование удаления подзадачи из эпика
     @Test
     void testRemoveSubtaskId() {
         Epic epic = new Epic("Epic 1", "Description 1");
