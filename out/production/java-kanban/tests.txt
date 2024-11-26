@@ -1,0 +1,4 @@
+./test/manager/ManagersTest.java
+./test/model/EpicTest.java
+./test/model/SubtaskTest.java
+./test/model/TaskTest.java

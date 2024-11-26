@@ -1,4 +1,4 @@
-package test.model;
+package com.yandex.tracker.test.model;
 
 import static org.junit.jupiter.api.Assertions.*;
 

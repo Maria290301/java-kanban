@@ -1,4 +1,4 @@
-package test.manager;
+package com.yandex.tracker.test.manager;
 
 import com.yandex.tracker.model.Epic;
 import com.yandex.tracker.model.Subtask;
