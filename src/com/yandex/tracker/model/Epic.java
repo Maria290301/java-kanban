@@ -24,7 +24,6 @@ public class Epic extends Task {
         subtasks.clear();
     }
 
-
     public TaskStatus getStatus() {
         return super.getStatus();
     }

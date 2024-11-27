@@ -156,15 +156,23 @@ public class ManagersTest {
         Epic epic = new Epic("Epic 1", "Description for Epic 1");
         int epicId = manager.createEpic(epic);
 
-        Subtask subtask = new Subtask("Subtask 1", "Description for Subtask 1", TaskStatus.NEW, epicId);
+        Subtask subtask = new Subtask("Subtask 1",
+                "Description for Subtask 1", TaskStatus.NEW, epicId);
         int subtaskId = manager.createSubtask(subtask);
         epic.addSubtask(subtask);
-        assertTrue(epic.getSubtasks().contains(subtask));
-        int newSubtaskId = 2;
-        subtask.setId(newSubtaskId);
 
-        assertEquals(newSubtaskId, subtask.getId());
-        assertTrue(epic.getSubtasks().stream().anyMatch(s -> s.getId() == newSubtaskId));
+        assertTrue(epic.getSubtasks().contains(subtask), "Эпик должен содержать подзадачу.");
+
+        Subtask newSubtask = new Subtask("Subtask 1 Updated",
+                "Description for Subtask 1 Updated", TaskStatus.NEW, epicId);
+        int newSubtaskId = manager.createSubtask(newSubtask);
+
+        epic.removeSubtask(subtaskId);
+        epic.addSubtask(newSubtask);
+
+        assertFalse(epic.getSubtasks().contains(subtask), "Эпик не должен содержать старую подзадачу.");
+        assertTrue(epic.getSubtasks().contains(newSubtask), "Эпик должен содержать новую подзадачу.");
+        assertEquals(newSubtaskId, newSubtask.getId(), "ID новой подзадачи должен соответствовать ожидаемому.");
     }
 
     // Тестирование целостности данных при обновлении задачи
