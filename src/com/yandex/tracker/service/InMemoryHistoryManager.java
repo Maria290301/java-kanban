@@ -15,23 +15,17 @@ public class InMemoryHistoryManager implements HistoryManager {
         if (task == null) {
             return;
         }
-        Integer taskId = task.getId();
-
-        if (history.containsKey(taskId)) {
-            removeNode(history.get(taskId));
-        }
-
-        Node<Task> newNode = new Node<>(task);
-        history.put(taskId, newNode);
-        linkLast(newNode);
+        final int id = task.getId();
+        removeNode(history.get(id));
+        linkLast(task);
+        history.put(id, last);
     }
 
     @Override
     public void remove(int id) {
-        Node<Task> nodeToRemove = history.get(id);
+        Node<Task> nodeToRemove = history.remove(id);
         if (nodeToRemove != null) {
             removeNode(nodeToRemove);
-            history.remove(id);
         }
     }
 
@@ -40,7 +34,8 @@ public class InMemoryHistoryManager implements HistoryManager {
         return getTasks();
     }
 
-    private void linkLast(Node<Task> newNode) {
+    private void linkLast(Task task) {
+        Node<Task> newNode = new Node<>(task);
         final Node<Task> oldLast = last;
         newNode.prev = oldLast;
         last = newNode;
