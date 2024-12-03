@@ -57,14 +57,19 @@ public class FileBackedTaskManagerTest {
     public void testLoadMultipleTasks() throws IOException {
         String content = "id,type,name,status,description,epic\n" +
                 "1,TASK,Task 1,NEW,Description 1,0\n" +
-                "2,TASK,Task 2,IN_PROGRESS,Description 2,0\n";
+                "2,TASK,Task 2,IN_PROGRESS,Description 2,0\n" +
+                "1,TASK,Duplicate Task 1,NEW,Description 1,0\n";
+
         Files.writeString(tempFile.toPath(), content);
 
-        FileBackedTaskManager loadedManager = FileBackedTaskManager.loadFromFile(tempFile, new InMemoryHistoryManager());
+        IllegalArgumentException thrown = assertThrows(IllegalArgumentException.class, () -> {
+            FileBackedTaskManager.loadFromFile(tempFile, new InMemoryHistoryManager());
+        });
 
-        assertEquals(2, loadedManager.getTasks().size());
-        assertEquals("Task 1", loadedManager.getTasks().get(0).getNameTask());
-        assertEquals("Task 2", loadedManager.getTasks().get(1).getNameTask());
+        assertEquals("Задача с таким идентификатором уже существует", thrown.getMessage());
+
+        FileBackedTaskManager emptyManager = new FileBackedTaskManager(new InMemoryHistoryManager(), tempFile);
+        assertEquals(0, emptyManager.getTasks().size());
     }
 
     // Тестирование обработки ошибок

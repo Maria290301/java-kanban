@@ -18,6 +18,9 @@ public class FileBackedTaskManager extends InMemoryTaskManager implements TaskMa
 
     @Override
     public int createTask(Task task) {
+        if (getTasks().stream().anyMatch(t -> t.getId() == task.getId())) {
+            throw new IllegalArgumentException("Задача с таким идентификатором уже существует");
+        }
         int taskId = super.createTask(task);
         save();
         return taskId;
@@ -25,6 +28,9 @@ public class FileBackedTaskManager extends InMemoryTaskManager implements TaskMa
 
     @Override
     public int createEpic(Epic epic) {
+        if (getEpics().stream().anyMatch(e -> e.getId() == epic.getId())) {
+            throw new IllegalArgumentException("Эпик с таким идентификатором уже существует");
+        }
         int epicId = super.createEpic(epic);
         save();
         return epicId;
@@ -32,6 +38,9 @@ public class FileBackedTaskManager extends InMemoryTaskManager implements TaskMa
 
     @Override
     public Integer createSubtask(Subtask subtask) {
+        if (getSubtasks().stream().anyMatch(s -> s.getId() == subtask.getId())) {
+            throw new IllegalArgumentException("Подзадача с таким идентификатором уже существует");
+        }
         int subtaskId = super.createSubtask(subtask);
         save();
         return subtaskId;
