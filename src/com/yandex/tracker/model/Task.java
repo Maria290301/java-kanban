@@ -9,6 +9,7 @@ public class Task {
     protected String descriptionTask;
     protected int id;
     protected TaskStatus status = TaskStatus.NEW;
+    private int epicId;
 
     public Task() {
     }
@@ -51,19 +52,25 @@ public class Task {
         this.status = status;
     }
 
+    public void setEpicId(int epicId) {
+        this.epicId = epicId;
+    }
+
+    public int getEpicId() {
+        return epicId;
+    }
+
     @Override
     public boolean equals(Object obj) {
         if (this == obj) return true;
         if (obj == null || getClass() != obj.getClass()) return false;
         Task task = (Task) obj;
-        return id == task.id && Objects.equals(nameTask, task.nameTask) &&
-                Objects.equals(descriptionTask, task.descriptionTask) &&
-                Objects.equals(status, task.status);
+        return id == task.id;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(nameTask, descriptionTask, id, status);
+        return Objects.hash(id);
     }
 
     @Override
