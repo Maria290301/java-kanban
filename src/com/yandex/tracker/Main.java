@@ -10,7 +10,7 @@ import com.yandex.tracker.service.TaskStatus;
 public class Main {
     public static void main(String[] args) {
 
-        TaskManager manager = Managers.getInMemoryTaskManager(Managers.getDefaultHistory());
+        TaskManager manager = Managers.getDefault();
 
         Task task1 = new Task("Task #1", "Task1 description", TaskStatus.NEW);
         Task task2 = new Task("Task #2", "Task2 description", TaskStatus.IN_PROGRESS);

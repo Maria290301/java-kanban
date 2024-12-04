@@ -3,6 +3,7 @@ package manager;
 import com.yandex.tracker.model.Task;
 import com.yandex.tracker.service.FileBackedTaskManager;
 import com.yandex.tracker.service.InMemoryHistoryManager;
+import com.yandex.tracker.service.ManagerSaveException;
 import com.yandex.tracker.service.TaskStatus;
 import org.junit.jupiter.api.*;
 
@@ -20,7 +21,7 @@ public class FileBackedTaskManagerTest {
     public void setUp() throws IOException {
         tempFile = File.createTempFile("tempTasks", ".csv");
         tempFile.deleteOnExit();
-        manager = new FileBackedTaskManager(new InMemoryHistoryManager(), tempFile);
+        manager = new FileBackedTaskManager(tempFile);
     }
 
     // Тестирование сохранения и загрузки пустого файла
@@ -45,6 +46,8 @@ public class FileBackedTaskManagerTest {
 
         assertEquals(2, manager.getTasks().size());
 
+        manager.save();
+
         FileBackedTaskManager loadedManager = FileBackedTaskManager.loadFromFile(tempFile, new InMemoryHistoryManager());
 
         assertEquals(2, loadedManager.getTasks().size());
@@ -68,7 +71,7 @@ public class FileBackedTaskManagerTest {
 
         assertEquals("Задача с таким идентификатором уже существует", thrown.getMessage());
 
-        FileBackedTaskManager emptyManager = new FileBackedTaskManager(new InMemoryHistoryManager(), tempFile);
+        FileBackedTaskManager emptyManager = new FileBackedTaskManager(tempFile);
         assertEquals(0, emptyManager.getTasks().size());
     }
 
@@ -76,7 +79,7 @@ public class FileBackedTaskManagerTest {
     @Test
     public void testLoadFromNonExistentFile() {
         File nonExistentFile = new File("non_existent_file.csv");
-        assertThrows(FileBackedTaskManager.ManagerSaveException.class, () -> {
+        assertThrows(ManagerSaveException.class, () -> {
             FileBackedTaskManager.loadFromFile(nonExistentFile, new InMemoryHistoryManager());
         });
     }

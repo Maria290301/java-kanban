@@ -1,12 +1,14 @@
 package com.yandex.tracker.service;
 
+import java.io.File;
+
 public class Managers {
 
     private Managers() {
     }
 
-    public static TaskManager getInMemoryTaskManager(HistoryManager historyManager) {
-        return new InMemoryTaskManager(historyManager);
+    public static TaskManager getDefault() {
+        return new FileBackedTaskManager(new File("resources/task.csv"));
     }
 
     public static HistoryManager getDefaultHistory() {
