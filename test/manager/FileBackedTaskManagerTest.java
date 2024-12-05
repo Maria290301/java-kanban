@@ -78,7 +78,12 @@ public class FileBackedTaskManagerTest {
     // Тестирование обработки ошибок
     @Test
     public void testLoadFromNonExistentFile() {
-        File nonExistentFile = new File("non_existent_file.csv");
+        File nonExistentFile = new File("test/resources/non_existent_file.csv");
+
+        if (nonExistentFile.exists()) {
+            nonExistentFile.delete();
+        }
+
         assertThrows(ManagerSaveException.class, () -> {
             FileBackedTaskManager.loadFromFile(nonExistentFile, new InMemoryHistoryManager());
         });

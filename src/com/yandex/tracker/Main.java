@@ -62,6 +62,11 @@ public class Main {
         }
         final Epic epic = manager.getEpicById(epicId1);
         epic.setStatus(TaskStatus.NEW);
+
+        Subtask newSubtask = new Subtask("Новая подзадача для Эпика #1",
+                "Описание новой подзадачи", TaskStatus.NEW, epicId1);
+        manager.createSubtask(newSubtask);
+
         manager.updateEpic(epic);
         System.out.println("CHANGE STATUS: Epic1 IN_PROGRESS->NEW");
         printAllTasks(manager);

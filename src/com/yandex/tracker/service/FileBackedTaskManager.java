@@ -13,6 +13,17 @@ public class FileBackedTaskManager extends InMemoryTaskManager implements TaskMa
 
     public FileBackedTaskManager(File file) {
         this.file = file;
+        if (!file.exists()) {
+            try {
+                File parentDir = file.getParentFile();
+                if (parentDir != null) {
+                    parentDir.mkdirs();
+                }
+                file.createNewFile();
+            } catch (IOException e) {
+                throw new ManagerSaveException("Ошибка при создании файла", e);
+            }
+        }
     }
 
     @Override
@@ -117,31 +128,18 @@ public class FileBackedTaskManager extends InMemoryTaskManager implements TaskMa
     }
 
     public static String toString(Task task) {
+        int epicId = 0;
         if (task instanceof Subtask subtask) {
-            return String.format("%d,SUBTASK,%s,%s,%s,%d",
-                    subtask.getId(),
-                    subtask.getNameTask(),
-                    subtask.getStatus(),
-                    subtask.getDescriptionTask(),
-                    subtask.getEpicId());
-        } else if (task instanceof Epic epic) {
-            return String.format("%d,EPIC,%s,%s,%s",
-                    epic.getId(),
-                    epic.getNameTask(),
-                    epic.getStatus(),
-                    epic.getDescriptionTask());
-        } else if (task != null) {
-            return String.format("%d,TASK,%s,%s,%s",
-                    task.getId(),
-                    task.getNameTask(),
-                    task.getStatus(),
-                    task.getDescriptionTask());
-        } else {
-            throw new IllegalArgumentException("Неизвестный тип задачи: " + task.getClass());
+            epicId = subtask.getEpicId();
         }
+        return task.getId() + "," + task.getTaskType() + "," + task.getNameTask() + "," + task.getStatus() + ","
+                + task.getDescriptionTask() + "," + epicId;
     }
 
     public static FileBackedTaskManager loadFromFile(File file, HistoryManager historyManager) {
+        if (!file.exists()) {
+            throw new ManagerSaveException("Файл не существует: " + file.getAbsolutePath(), null);
+        }
         FileBackedTaskManager manager = new FileBackedTaskManager(file);
         try {
             List<String> lines = Files.readAllLines(file.toPath());
@@ -149,14 +147,19 @@ public class FileBackedTaskManager extends InMemoryTaskManager implements TaskMa
                 for (String line : lines.subList(1, lines.size())) {
                     if (line.trim().isEmpty()) continue;
                     Task task = fromString(line);
-                    if (task instanceof Subtask) {
-                        manager.createSubtask((Subtask) task);
-                    } else if (task instanceof Epic) {
-                        manager.createEpic((Epic) task);
+                    if (task instanceof Epic epic) {
+                        manager.createEpic(epic);
+                    } else if (task instanceof Subtask subtask) {
+                        manager.createSubtask(subtask);
+                        Epic epic = manager.getEpicById((subtask.getEpicId()));
+                        if (epic != null) {
+                            epic.addSubtask(subtask);
+                        } else {
+                            throw new IllegalArgumentException("Эпик с ID " + subtask.getEpicId() + " не найден.");
+                        }
                     } else {
                         manager.createTask(task);
                     }
-                    historyManager.add(task);
                 }
             }
         } catch (IOException e) {

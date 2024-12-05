@@ -28,14 +28,17 @@ public class ManagersTest {
     @Test
     void testEpicCannotAddItselfAsSubtask() {
         Epic epic = new Epic("Epic 1", "Epic description");
+        epic.setId(1);
         Subtask subtask = new Subtask("Subtask 1", "Subtask description", TaskStatus.NEW, epic.getId());
 
         List<Subtask> subtasks = new ArrayList<>();
         subtasks.add(subtask);
 
-        assertThrows(IllegalArgumentException.class, () -> {
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
             epic.setSubtasks(subtasks);
-        }, "Эпик не может добавлять себя в качестве подзадачи.");
+        });
+
+        assertEquals("Эпик не может добавлять себя в качестве подзадачи.", exception.getMessage());
     }
 
     // Тестирование создания экземпляров менеджера задач
