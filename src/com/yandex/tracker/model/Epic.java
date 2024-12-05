@@ -1,6 +1,7 @@
 package com.yandex.tracker.model;
 
 import com.yandex.tracker.service.TaskStatus;
+import com.yandex.tracker.service.TaskType;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -10,6 +11,12 @@ public class Epic extends Task {
 
     public Epic(String name, String description) {
         super(name, description, TaskStatus.NEW);
+        this.taskType = TaskType.EPIC;
+    }
+
+    public Epic(int id, String name, String description) {
+        super(id, name, description, TaskStatus.NEW);
+        this.taskType = TaskType.EPIC;
     }
 
     public void addSubtask(Subtask subtask) {
@@ -38,7 +45,7 @@ public class Epic extends Task {
 
     public void setSubtasks(List<Subtask> subtasks) {
         for (Subtask subtask : subtasks) {
-            if (subtask.getEpicId() == this.id) {
+            if (subtask.getEpicId() == this.getId()) {
                 throw new IllegalArgumentException("Эпик не может добавлять себя в качестве подзадачи.");
             }
         }

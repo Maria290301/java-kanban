@@ -1,6 +1,7 @@
 package com.yandex.tracker.model;
 
 import com.yandex.tracker.service.TaskStatus;
+import com.yandex.tracker.service.TaskType;
 
 public class Subtask extends Task {
     private static int idCounter = 0;
@@ -13,6 +14,13 @@ public class Subtask extends Task {
         this.status = status;
         this.epicId = epicId;
         this.id = ++idCounter;
+        this.taskType = TaskType.SUBTASK;
+    }
+
+    public Subtask(int id, String nameTask, String descriptionTask, TaskStatus status, int epicId) {
+        super(id, nameTask, descriptionTask, status);
+        this.epicId = epicId;
+        this.taskType = TaskType.SUBTASK;
     }
 
     public int getEpicId() {
