@@ -6,30 +6,48 @@ import com.yandex.tracker.model.Task;
 import com.yandex.tracker.service.Managers;
 import com.yandex.tracker.service.TaskManager;
 import com.yandex.tracker.service.TaskStatus;
+import com.yandex.tracker.service.TaskType;
+
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.util.List;
 
 public class Main {
     public static void main(String[] args) {
 
         TaskManager manager = Managers.getDefault();
 
-        Task task1 = new Task("Task #1", "Task1 description", TaskStatus.NEW);
-        Task task2 = new Task("Task #2", "Task2 description", TaskStatus.IN_PROGRESS);
+        Task task1 = new Task(1, "Task #1", "Task1 description", TaskStatus.NEW,
+                TaskType.TASK, Duration.ofHours(1), LocalDateTime.now());
+        Task task2 = new Task(2, "Task #2", "Task2 description", TaskStatus.IN_PROGRESS,
+                TaskType.TASK, Duration.ofHours(1), LocalDateTime.now());
         final int taskId1 = manager.createTask(task1);
         final int taskId2 = manager.createTask(task2);
 
-        Epic epic1 = new Epic("Epic #1", "Epic1 description");
-        Epic epic2 = new Epic("Epic #2", "Epic2 description");
+        Epic epic1 = new Epic(1, "Epic #1", "Epic1 description", TaskStatus.NEW,
+                Duration.ofHours(1), LocalDateTime.now());
+        Epic epic2 = new Epic(2, "Epic #2", "Epic2 description", TaskStatus.NEW,
+                Duration.ofHours(1), LocalDateTime.now());
         final int epicId1 = manager.createEpic(epic1);
         final int epicId2 = manager.createEpic(epic2);
 
-        Subtask subtask1 = new Subtask("Subtask #1-1", "Subtask1 description", TaskStatus.NEW, epicId1);
-        Subtask subtask2 = new Subtask("Subtask #2-1", "Subtask1 description", TaskStatus.NEW, epicId1);
-        Subtask subtask3 = new Subtask("Subtask #3-2", "Subtask1 description", TaskStatus.DONE, epicId2);
+        Subtask subtask1 = new Subtask(1, "Subtask #1-1", "Subtask1 description",
+                TaskStatus.NEW, Duration.ofHours(1), LocalDateTime.now(), epicId1);
+        Subtask subtask2 = new Subtask(2, "Subtask #2-1", "Subtask2 description",
+                TaskStatus.NEW,  Duration.ofHours(1), LocalDateTime.now(), epicId1);
+        Subtask subtask3 = new Subtask(3, "Subtask #3-2", "Subtask3 description",
+                TaskStatus.DONE, Duration.ofHours(1), LocalDateTime.now(), epicId2);
         final Integer subtaskId1 = manager.createSubtask(subtask1);
         final Integer subtaskId2 = manager.createSubtask(subtask2);
         final Integer subtaskId3 = manager.createSubtask(subtask3);
 
         printAllTasks(manager);
+
+        System.out.println("Приоритетные задачи:");
+        List<Task> prioritizedTasks = manager.getPrioritizedTasks();
+        for (Task task : prioritizedTasks) {
+            System.out.println(task);
+        }
 
         final Task task = manager.getTaskById(taskId2);
         task.setStatus(TaskStatus.DONE);
@@ -63,8 +81,8 @@ public class Main {
         final Epic epic = manager.getEpicById(epicId1);
         epic.setStatus(TaskStatus.NEW);
 
-        Subtask newSubtask = new Subtask("Новая подзадача для Эпика #1",
-                "Описание новой подзадачи", TaskStatus.NEW, epicId1);
+        Subtask newSubtask = new Subtask(4, "Новая подзадача для Эпика #1",
+                "Описание новой подзадачи", TaskStatus.NEW, Duration.ofHours(1), LocalDateTime.now(), epicId1);
         manager.createSubtask(newSubtask);
 
         manager.updateEpic(epic);

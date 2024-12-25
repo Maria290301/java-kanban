@@ -4,31 +4,56 @@ import com.yandex.tracker.service.TaskStatus;
 import com.yandex.tracker.service.TaskType;
 
 import java.util.Objects;
+import java.time.Duration;
+import java.time.LocalDateTime;
 
 public class Task {
     protected String nameTask;
     protected String descriptionTask;
     protected int id;
     protected TaskStatus status = TaskStatus.NEW;
-    private int epicId;
     protected TaskType taskType;
+    private Duration duration;
+    private LocalDateTime startTime;
 
-    public Task() {
-    }
-
-    public Task(String nameTask, String descriptionTask, TaskStatus status) {
-        this.nameTask = nameTask;
-        this.descriptionTask = descriptionTask;
-        this.status = status;
-        this.taskType = TaskType.TASK;
-    }
-
-    public Task(int id, String nameTask, String descriptionTask, TaskStatus status) {
+    public Task(int id, String nameTask, String descriptionTask, TaskStatus status, TaskType taskType,
+                Duration duration, LocalDateTime startTime) {
         this.id = id;
         this.nameTask = nameTask;
         this.descriptionTask = descriptionTask;
         this.status = status;
-        this.taskType = TaskType.TASK;
+        this.taskType = taskType;
+        this.duration = duration;
+        this.startTime = startTime;
+    }
+
+    public Duration getDuration() {
+        return duration;
+    }
+
+    public void setDuration(Duration duration) {
+        this.duration = duration;
+    }
+
+
+    public LocalDateTime getStartTime() {
+        return startTime;
+    }
+
+    public void setStartTime(LocalDateTime startTime) {
+        this.startTime = startTime;
+    }
+
+
+    public LocalDateTime getEndTime() {
+        return startTime != null && duration != null ? startTime.plus(duration) : null;
+    }
+
+    public boolean overlapsWith(Task other) {
+        if (other == null || this.startTime == null || other.startTime == null) {
+            return false;
+        }
+        return this.startTime.isBefore(other.getEndTime()) && other.getStartTime().isBefore(this.getEndTime());
     }
 
     public String getNameTask() {
@@ -63,16 +88,12 @@ public class Task {
         this.status = status;
     }
 
-    public void setEpicId(int epicId) {
-        this.epicId = epicId;
-    }
-
-    public int getEpicId() {
-        return epicId;
-    }
-
     public TaskType getTaskType() {
         return taskType;
+    }
+
+    public void setTaskType(TaskType taskType) {
+        this.taskType = taskType;
     }
 
     @Override
@@ -92,6 +113,4 @@ public class Task {
     public String toString() {
         return nameTask;
     }
-
-
 }
