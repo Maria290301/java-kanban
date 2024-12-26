@@ -103,4 +103,174 @@ public abstract class TaskManagerTest<T extends TaskManager> {
 
         assertThrows(IllegalArgumentException.class, () -> manager.createTask(task2), "Задачи пересекаются по времени.");
     }
+    @Test
+    public void testAddTask() {
+        Task task = new Task(0, "Task 1", "Description 1", TaskStatus.NEW, TaskType.TASK, Duration.ofHours(1), LocalDateTime.now());
+        int taskId = manager.createTask(task);
+
+        assertEquals(1, manager.getPrioritizedTasks().size());
+        assertEquals(task, manager.getPrioritizedTasks().get(0));
+        assertEquals(taskId, task.getId());
+    }
+
+    @Test
+    public void testRemoveTaskById() {
+        Task task = new Task(0, "Task 1", "Description 1", TaskStatus.NEW, TaskType.TASK,
+                Duration.ofHours(1), LocalDateTime.now());
+        int taskId = manager.createTask(task);
+
+        manager.removeTaskById(taskId);
+
+        assertEquals(0, manager.getPrioritizedTasks().size());
+    }
+
+    @Test
+    public void testRemoveAllTasks() {
+        LocalDateTime now = LocalDateTime.now();
+        Task task1 = new Task(0, "Task 1", "Description 1", TaskStatus.NEW, TaskType.TASK,
+                Duration.ofHours(1), now);
+        Task task2 = new Task(0, "Task 2", "Description 2", TaskStatus.NEW, TaskType.TASK,
+                Duration.ofHours(1), now.plusHours(2)); // Начинается через 2 часа
+
+        manager.createTask(task1);
+        manager.createTask(task2);
+
+        manager.removeTasks();
+
+        assertEquals(0, manager.getPrioritizedTasks().size());
+    }
+
+    @Test
+    public void testUpdateTask() {
+        Task task = new Task(0, "Task 1", "Description 1", TaskStatus.NEW, TaskType.TASK,
+                Duration.ofHours(1), LocalDateTime.now());
+        int taskId = manager.createTask(task);
+
+        Task updatedTask = new Task(taskId, "Updated Task", "Updated Description",
+                TaskStatus.IN_PROGRESS, TaskType.TASK, Duration.ofHours(2), LocalDateTime.now().plusHours(1));
+        manager.updateTask(updatedTask);
+
+        assertEquals(1, manager.getPrioritizedTasks().size());
+        assertEquals(updatedTask, manager.getPrioritizedTasks().get(0));
+    }
+
+    @Test
+    public void testAddSubtask() {
+        Epic epic = new Epic(0, "Epic 1", "Epic Description", TaskStatus.NEW,
+                Duration.ofHours(1), LocalDateTime.now());
+        int epicId = manager.createEpic(epic);
+
+        Subtask subtask = new Subtask(0, "Subtask 1", "Subtask Description", TaskStatus.NEW,
+                Duration.ofHours(1), LocalDateTime.now(), epicId);
+        int subtaskId = manager.createSubtask(subtask);
+
+        assertEquals(1, manager.getEpicSubtasks(epicId).size());
+        assertEquals(subtask, manager.getEpicSubtasks(epicId).get(0));
+        assertEquals(subtaskId, subtask.getId());
+    }
+
+    @Test
+    public void testRemoveSubtaskById() {
+        Epic epic = new Epic(0, "Epic 1", "Epic Description", TaskStatus.NEW,
+                Duration.ofHours(1), LocalDateTime.now());
+        int epicId = manager.createEpic(epic);
+
+        Subtask subtask = new Subtask(0, "Subtask 1", "Subtask Description", TaskStatus.NEW,
+                Duration.ofHours(1), LocalDateTime.now(), epicId);
+        int subtaskId = manager.createSubtask(subtask);
+
+        manager.removeSubtaskById(subtaskId);
+
+        assertEquals(0, manager.getEpicSubtasks(epicId).size());
+    }
+
+    @Test
+    public void testRemoveAllSubtasks() {
+        Epic epic = new Epic(0, "Epic 1", "Epic Description", TaskStatus.NEW,
+                Duration.ofHours(1), LocalDateTime.now());
+        int epicId = manager.createEpic(epic);
+
+        // Установите разные временные интервалы для подзадач
+        LocalDateTime now = LocalDateTime.now();
+        Subtask subtask1 = new Subtask(0, "Subtask 1", "Subtask Description", TaskStatus.NEW,
+                Duration.ofHours(1), now, epicId);
+        Subtask subtask2 = new Subtask(0, "Subtask 2", "Subtask Description", TaskStatus.NEW,
+                Duration.ofHours(1), now.plusHours(2), epicId);
+
+        manager.createSubtask(subtask1);
+        manager.createSubtask(subtask2);
+
+        manager.removeSubtasks();
+
+        assertEquals(0, manager.getEpicSubtasks(epicId).size());
+    }
+
+    @Test
+    public void testUpdateSubtask() {
+        Epic epic = new Epic(0, "Epic 1", "Epic Description", TaskStatus.NEW,
+                Duration.ofHours(1), LocalDateTime.now());
+        int epicId = manager.createEpic(epic);
+
+        Subtask subtask = new Subtask(0, "Subtask 1", "Subtask Description", TaskStatus.NEW,
+                Duration.ofHours(1), LocalDateTime.now(), epicId);
+        int subtaskId = manager.createSubtask(subtask);
+
+        Subtask updatedSubtask = new Subtask(subtaskId, "Updated Subtask", "Updated Description",
+                TaskStatus.IN_PROGRESS, Duration.ofHours(2), LocalDateTime.now().plusHours(1), epicId);
+        manager.updateSubtask(updatedSubtask);
+
+        assertEquals(1, manager.getEpicSubtasks(epicId).size());
+        assertEquals(updatedSubtask, manager.getEpicSubtasks(epicId).get(0));
+    }
+
+    @Test
+    public void testAddEpic() {
+        Epic epic = new Epic(0, "Epic 1", "Epic Description", TaskStatus.NEW,
+                Duration.ofHours(1), LocalDateTime.now());
+        int epicId = manager.createEpic(epic);
+
+        assertEquals(1, manager.getEpics().size());
+        assertEquals(epic, manager.getEpics().get(0));
+        assertEquals(epicId, epic.getId());
+    }
+
+    @Test
+    public void testRemoveEpicById() {
+        Epic epic = new Epic(0, "Epic 1", "Epic Description", TaskStatus.NEW,
+                Duration.ofHours(1), LocalDateTime.now());
+        int epicId = manager.createEpic(epic);
+
+        manager.removeEpicById(epicId);
+
+        assertEquals(0, manager.getEpics().size());
+    }
+
+    @Test
+    public void testRemoveAllEpics() {
+        Epic epic1 = new Epic(0, "Epic 1", "Epic Description 1", TaskStatus.NEW,
+                Duration.ofHours(1), LocalDateTime.now());
+        Epic epic2 = new Epic(0, "Epic 2", "Epic Description 2", TaskStatus.NEW,
+                Duration.ofHours(1), LocalDateTime.now().plusMinutes(30));
+
+        manager.createEpic(epic1);
+        manager.createEpic(epic2);
+
+        manager.removeEpics();
+
+        assertEquals(0, manager.getEpics().size());
+    }
+
+    @Test
+    public void testUpdateEpic() {
+        Epic epic = new Epic(0, "Epic 1", "Epic Description", TaskStatus.NEW,
+                Duration.ofHours(1), LocalDateTime.now());
+        int epicId = manager.createEpic(epic);
+
+        Epic updatedEpic = new Epic(epicId, "Updated Epic", "Updated Description",
+                TaskStatus.IN_PROGRESS, Duration.ofHours(2), LocalDateTime.now().plusHours(1));
+        manager.updateEpic(updatedEpic);
+
+        assertEquals(1, manager.getEpics().size());
+        assertEquals(updatedEpic, manager.getEpics().get(0));
+    }
 }

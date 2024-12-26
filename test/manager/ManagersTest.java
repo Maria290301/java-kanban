@@ -171,7 +171,7 @@ public class ManagersTest {
 
     // Тестирование изменения ID эпика подзадачи
     @Test
-    void testUpdateSubtaskChangesEpicSubtaskIds()  {
+    void testUpdateSubtaskChangesEpicSubtaskIds() {
         InMemoryTaskManager manager = new InMemoryTaskManager(new InMemoryHistoryManager());
         Epic epic = new Epic(1, "Epic 1", "Description for Epic 1", TaskStatus.NEW,
                 Duration.ofHours(1), LocalDateTime.now());
