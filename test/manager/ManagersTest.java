@@ -78,7 +78,7 @@ public class ManagersTest {
         assertEquals(epic, manager.getEpicById(epicId));
 
         Subtask subtask = new Subtask(3, "Subtask 1", "Description 1", TaskStatus.NEW,
-                Duration.ofHours(1), LocalDateTime.now(), epicId);
+                Duration.ofHours(1), LocalDateTime.now().plusHours(2), epicId);
         int subtaskId = manager.createSubtask(subtask);
         assertEquals(subtask, manager.getSubtaskById(subtaskId));
     }
@@ -212,12 +212,13 @@ public class ManagersTest {
     @Test
     public void testCreateTask_OverlappingTasks() {
         InMemoryTaskManager manager = new InMemoryTaskManager();
+
         Task task1 = new Task(1, "Task 1", "Description 1", TaskStatus.NEW, TaskType.TASK,
                 Duration.ofHours(2), LocalDateTime.of(2023, 10, 1, 10, 0));
+        manager.createTask(task1);
+
         Task task2 = new Task(2, "Task 2", "Description 2", TaskStatus.NEW, TaskType.TASK,
                 Duration.ofHours(1), LocalDateTime.of(2023, 10, 1, 11, 0));
-
-        manager.createTask(task1);
 
         Exception exception = assertThrows(IllegalArgumentException.class, () -> {
             manager.createTask(task2);

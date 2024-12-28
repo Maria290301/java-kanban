@@ -20,23 +20,26 @@ public class Main {
         Task task1 = new Task(1, "Task #1", "Task1 description", TaskStatus.NEW,
                 TaskType.TASK, Duration.ofHours(1), LocalDateTime.now());
         Task task2 = new Task(2, "Task #2", "Task2 description", TaskStatus.IN_PROGRESS,
-                TaskType.TASK, Duration.ofHours(1), LocalDateTime.now());
+                TaskType.TASK, Duration.ofHours(1), LocalDateTime.now().plusHours(2));
+
         final int taskId1 = manager.createTask(task1);
         final int taskId2 = manager.createTask(task2);
 
         Epic epic1 = new Epic(1, "Epic #1", "Epic1 description", TaskStatus.NEW,
-                Duration.ofHours(1), LocalDateTime.now());
+                Duration.ofHours(1), LocalDateTime.now().plusHours(3));
         Epic epic2 = new Epic(2, "Epic #2", "Epic2 description", TaskStatus.NEW,
-                Duration.ofHours(1), LocalDateTime.now());
+                Duration.ofHours(1), LocalDateTime.now().plusHours(4));
+
         final int epicId1 = manager.createEpic(epic1);
         final int epicId2 = manager.createEpic(epic2);
 
         Subtask subtask1 = new Subtask(1, "Subtask #1-1", "Subtask1 description",
-                TaskStatus.NEW, Duration.ofHours(1), LocalDateTime.now(), epicId1);
+                TaskStatus.NEW, Duration.ofHours(1), LocalDateTime.now().plusHours(5), epicId1);
         Subtask subtask2 = new Subtask(2, "Subtask #2-1", "Subtask2 description",
-                TaskStatus.NEW,  Duration.ofHours(1), LocalDateTime.now(), epicId1);
+                TaskStatus.NEW, Duration.ofHours(1), LocalDateTime.now().plusHours(6), epicId1);
         Subtask subtask3 = new Subtask(3, "Subtask #3-2", "Subtask3 description",
-                TaskStatus.DONE, Duration.ofHours(1), LocalDateTime.now(), epicId2);
+                TaskStatus.DONE, Duration.ofHours(1), LocalDateTime.now().plusHours(7), epicId2);
+
         final Integer subtaskId1 = manager.createSubtask(subtask1);
         final Integer subtaskId2 = manager.createSubtask(subtask2);
         final Integer subtaskId3 = manager.createSubtask(subtask3);
@@ -81,9 +84,19 @@ public class Main {
         final Epic epic = manager.getEpicById(epicId1);
         epic.setStatus(TaskStatus.NEW);
 
+        System.out.println("Создание новой подзадачи для Эпика #1");
+        LocalDateTime newSubtaskStartTime = LocalDateTime.now().plusHours(8);
+        System.out.println("Время начала новой подзадачи: " + newSubtaskStartTime);
+
         Subtask newSubtask = new Subtask(4, "Новая подзадача для Эпика #1",
-                "Описание новой подзадачи", TaskStatus.NEW, Duration.ofHours(1), LocalDateTime.now(), epicId1);
-        manager.createSubtask(newSubtask);
+                "Описание новой подзадачи", TaskStatus.NEW, Duration.ofHours(1), newSubtaskStartTime, epicId1);
+
+        try {
+            manager.createSubtask(newSubtask);
+            System.out.println("Новая подзадача успешно создана.");
+        } catch (IllegalArgumentException e) {
+            System.err.println("Ошибка при создании подзадачи: " + e.getMessage());
+        }
 
         manager.updateEpic(epic);
         System.out.println("CHANGE STATUS: Epic1 IN_PROGRESS->NEW");

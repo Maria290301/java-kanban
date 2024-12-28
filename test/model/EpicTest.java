@@ -50,9 +50,10 @@ class EpicTest {
                 Duration.ofMinutes(20), LocalDateTime.now());
         taskManager.createEpic(epic);
 
-        Subtask subtask1 = new Subtask(1, "Subtask 1", "Description 1", TaskStatus.NEW,
+        // Создание подзадач без явного указания id
+        Subtask subtask1 = new Subtask(0, "Subtask 1", "Description 1", TaskStatus.NEW,
                 Duration.ofMinutes(20), LocalDateTime.now(), epic.getId());
-        Subtask subtask2 = new Subtask(2, "Subtask 2", "Description 2", TaskStatus.NEW,
+        Subtask subtask2 = new Subtask(0, "Subtask 2", "Description 2", TaskStatus.NEW,
                 Duration.ofMinutes(25), LocalDateTime.now().plusMinutes(21), epic.getId());
 
         taskManager.createSubtask(subtask1);

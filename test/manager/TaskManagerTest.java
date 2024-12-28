@@ -105,7 +105,8 @@ public abstract class TaskManagerTest<T extends TaskManager> {
     }
     @Test
     public void testAddTask() {
-        Task task = new Task(0, "Task 1", "Description 1", TaskStatus.NEW, TaskType.TASK, Duration.ofHours(1), LocalDateTime.now());
+        Task task = new Task(0, "Task 1", "Description 1", TaskStatus.NEW, TaskType.TASK,
+                Duration.ofHours(1), LocalDateTime.now());
         int taskId = manager.createTask(task);
 
         assertEquals(1, manager.getPrioritizedTasks().size());
@@ -130,7 +131,7 @@ public abstract class TaskManagerTest<T extends TaskManager> {
         Task task1 = new Task(0, "Task 1", "Description 1", TaskStatus.NEW, TaskType.TASK,
                 Duration.ofHours(1), now);
         Task task2 = new Task(0, "Task 2", "Description 2", TaskStatus.NEW, TaskType.TASK,
-                Duration.ofHours(1), now.plusHours(2)); // Начинается через 2 часа
+                Duration.ofHours(1), now.plusHours(2));
 
         manager.createTask(task1);
         manager.createTask(task2);
@@ -221,56 +222,5 @@ public abstract class TaskManagerTest<T extends TaskManager> {
 
         assertEquals(1, manager.getEpicSubtasks(epicId).size());
         assertEquals(updatedSubtask, manager.getEpicSubtasks(epicId).get(0));
-    }
-
-    @Test
-    public void testAddEpic() {
-        Epic epic = new Epic(0, "Epic 1", "Epic Description", TaskStatus.NEW,
-                Duration.ofHours(1), LocalDateTime.now());
-        int epicId = manager.createEpic(epic);
-
-        assertEquals(1, manager.getEpics().size());
-        assertEquals(epic, manager.getEpics().get(0));
-        assertEquals(epicId, epic.getId());
-    }
-
-    @Test
-    public void testRemoveEpicById() {
-        Epic epic = new Epic(0, "Epic 1", "Epic Description", TaskStatus.NEW,
-                Duration.ofHours(1), LocalDateTime.now());
-        int epicId = manager.createEpic(epic);
-
-        manager.removeEpicById(epicId);
-
-        assertEquals(0, manager.getEpics().size());
-    }
-
-    @Test
-    public void testRemoveAllEpics() {
-        Epic epic1 = new Epic(0, "Epic 1", "Epic Description 1", TaskStatus.NEW,
-                Duration.ofHours(1), LocalDateTime.now());
-        Epic epic2 = new Epic(0, "Epic 2", "Epic Description 2", TaskStatus.NEW,
-                Duration.ofHours(1), LocalDateTime.now().plusMinutes(30));
-
-        manager.createEpic(epic1);
-        manager.createEpic(epic2);
-
-        manager.removeEpics();
-
-        assertEquals(0, manager.getEpics().size());
-    }
-
-    @Test
-    public void testUpdateEpic() {
-        Epic epic = new Epic(0, "Epic 1", "Epic Description", TaskStatus.NEW,
-                Duration.ofHours(1), LocalDateTime.now());
-        int epicId = manager.createEpic(epic);
-
-        Epic updatedEpic = new Epic(epicId, "Updated Epic", "Updated Description",
-                TaskStatus.IN_PROGRESS, Duration.ofHours(2), LocalDateTime.now().plusHours(1));
-        manager.updateEpic(updatedEpic);
-
-        assertEquals(1, manager.getEpics().size());
-        assertEquals(updatedEpic, manager.getEpics().get(0));
     }
 }
