@@ -1,24 +1,27 @@
 package com.yandex.tracker.service;
 
+import com.yandex.tracker.exception.ManagerSaveException;
 import com.yandex.tracker.model.Epic;
 import com.yandex.tracker.model.Subtask;
 import com.yandex.tracker.model.Task;
 
 import java.io.*;
 import java.nio.file.Files;
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.List;
 
-public class FileBackedTaskManager extends InMemoryTaskManager implements TaskManager {
+public class FileBackedTaskManager extends InMemoryTaskManager {
     private final File file;
 
     public FileBackedTaskManager(File file) {
         this.file = file;
+        File parentDir = file.getParentFile();
+        if (parentDir != null && !parentDir.exists()) {
+            throw new ManagerSaveException("Директория не существует: " + parentDir.getAbsolutePath(), null);
+        }
         if (!file.exists()) {
             try {
-                File parentDir = file.getParentFile();
-                if (parentDir != null) {
-                    parentDir.mkdirs();
-                }
                 file.createNewFile();
             } catch (IOException e) {
                 throw new ManagerSaveException("Ошибка при создании файла", e);
@@ -112,7 +115,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager implements TaskMa
 
     public void save() {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(file))) {
-            writer.write("id,type,name,status,description,epic\n");
+            writer.write("id,type,name,status,description,duration,startTime,epic\n");
             for (Task task : getTasks()) {
                 writer.write(toString(task) + "\n");
             }
@@ -133,25 +136,31 @@ public class FileBackedTaskManager extends InMemoryTaskManager implements TaskMa
             epicId = subtask.getEpicId();
         }
         return task.getId() + "," + task.getTaskType() + "," + task.getNameTask() + "," + task.getStatus() + ","
-                + task.getDescriptionTask() + "," + epicId;
+                + task.getDescriptionTask() + "," + task.getDuration() + "," + task.getStartTime() + "," + epicId;
     }
 
     public static FileBackedTaskManager loadFromFile(File file, HistoryManager historyManager) {
         if (!file.exists()) {
             throw new ManagerSaveException("Файл не существует: " + file.getAbsolutePath(), null);
         }
+
         FileBackedTaskManager manager = new FileBackedTaskManager(file);
+
         try {
             List<String> lines = Files.readAllLines(file.toPath());
+
             if (lines.size() > 1) {
                 for (String line : lines.subList(1, lines.size())) {
-                    if (line.trim().isEmpty()) continue;
+                    line = line.trim();
+                    if (line.isEmpty()) continue;
+
                     Task task = fromString(line);
+
                     if (task instanceof Epic epic) {
                         manager.createEpic(epic);
                     } else if (task instanceof Subtask subtask) {
                         manager.createSubtask(subtask);
-                        Epic epic = manager.getEpicById((subtask.getEpicId()));
+                        Epic epic = manager.getEpicById(subtask.getEpicId());
                         if (epic != null) {
                             epic.addSubtask(subtask);
                         } else {
@@ -165,12 +174,13 @@ public class FileBackedTaskManager extends InMemoryTaskManager implements TaskMa
         } catch (IOException e) {
             throw new ManagerSaveException("Ошибка при сохранении данных в файл", e);
         }
+
         return manager;
     }
 
     private static Task fromString(String value) {
         String[] fields = value.split(",");
-        if (fields.length < 5) {
+        if (fields.length < 8) {
             throw new IllegalArgumentException("Недостаточно данных для создания задачи");
         }
         final int id = Integer.parseInt(fields[0]);
@@ -178,12 +188,14 @@ public class FileBackedTaskManager extends InMemoryTaskManager implements TaskMa
         final String name = fields[2];
         final TaskStatus status = TaskStatus.valueOf(fields[3]);
         final String description = fields[4];
-        final int epicId = fields.length > 5 ? Integer.parseInt(fields[5]) : 0;
+        Duration duration = fields.length > 5 && !fields[5].isEmpty() ? Duration.parse(fields[5]) : null;
+        LocalDateTime startTime = fields.length > 6 && !fields[6].isEmpty() ? LocalDateTime.parse(fields[6]) : null;
+        final int epicId = fields.length > 7 ? Integer.parseInt(fields[7]) : 0;
 
         return switch (type) {
-            case TASK -> new Task(id, name, description, status);
-            case EPIC -> new Epic(id, name, description);
-            case SUBTASK -> new Subtask(id, name, description, status, epicId);
+            case TASK -> new Task(id, name, description, status, type, duration, startTime);
+            case EPIC -> new Epic(id, name, description, status, duration, startTime);
+            case SUBTASK -> new Subtask(id, name, description, status, duration, startTime, epicId);
         };
     }
 }

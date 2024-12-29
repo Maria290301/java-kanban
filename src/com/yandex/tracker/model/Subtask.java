@@ -3,24 +3,16 @@ package com.yandex.tracker.model;
 import com.yandex.tracker.service.TaskStatus;
 import com.yandex.tracker.service.TaskType;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
+
 public class Subtask extends Task {
-    private static int idCounter = 0;
     private int epicId;
-    private int id;
 
-    public Subtask(String nameTask, String descriptionTask, TaskStatus status, int epicId) {
-        this.nameTask = nameTask;
-        this.descriptionTask = descriptionTask;
-        this.status = status;
+    public Subtask(int id, String nameTask, String descriptionTask, TaskStatus status, Duration duration,
+                   LocalDateTime startTime, int epicId) {
+        super(id, nameTask, descriptionTask, status, TaskType.SUBTASK, duration, startTime);
         this.epicId = epicId;
-        this.id = ++idCounter;
-        this.taskType = TaskType.SUBTASK;
-    }
-
-    public Subtask(int id, String nameTask, String descriptionTask, TaskStatus status, int epicId) {
-        super(id, nameTask, descriptionTask, status);
-        this.epicId = epicId;
-        this.taskType = TaskType.SUBTASK;
     }
 
     public int getEpicId() {
